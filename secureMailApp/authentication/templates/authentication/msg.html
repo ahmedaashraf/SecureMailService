@@ -1,0 +1,20 @@
+<!-- {% extends 'authentication/header.html' %} -->
+
+
+{% block content %}
+
+<div class="container">
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label for="rec_email">Receiver Email </label>
+        <input id="rec_email" type="text" name="rec_email" value="{{ current_name }}">
+
+        <label for="msg">Message </label>
+        <input id="msg" type="text" name="msg" value="{{ current_name }}">
+        
+        <input type="submit" value="Send">
+    </form>
+ </div>
+
+{% endblock %}

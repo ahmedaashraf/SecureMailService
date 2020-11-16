@@ -1,12 +1,11 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .forms import MsgForm
 from django.contrib.auth import login , logout, authenticate
 from django.contrib import messages
 from .forms import NewUserForm
 from django.contrib.auth.decorators import login_required
-
-
 
 def register(request):
     if request.method == "POST":
@@ -42,6 +41,10 @@ def login_request(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            
+            request.session['password'] = password
+            request.session['username'] = username
+
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -56,3 +59,18 @@ def login_request(request):
                     template_name = "authentication/login.html",
                     context={"form":form})
 
+def msg(request):
+    form = MsgForm()
+    if request.method == 'POST':
+        form = MsgForm(request)
+        if form.is_valid():
+            password = request.session.get('password') 
+            sender_email = request.session.get('username')
+            form.save(request,sender_email, password)
+
+    return render(request=request,
+        template_name = "authentication/msg.html",
+        context={"form":form})
+
+# def receive_msg(request):
+#     pass
