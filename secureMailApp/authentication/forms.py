@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from authentication.models import sysuser
 
 from Crypto import Random
 from Crypto.PublicKey import RSA
@@ -18,11 +19,9 @@ def decrypt_message(encoded_encrypted_msg, privatekey):
 	return decoded_decrypted_msg.decode("utf-8")
 
 class NewUserForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    publickey = forms.CharField(max_length=255, label='Public Key',required=True)
     class Meta:
-        model = User
-        fields = ("username", "email", "password1", "password2")
+        model = sysuser
+        fields = ("email", "password1", "password2")
 
     def save(self, commit=True):
         user = super(NewUserForm, self).save(commit=False)
@@ -32,11 +31,11 @@ class NewUserForm(UserCreationForm):
         publickey = privatekey.publickey()
 
         f = open("private.pem", "wb")
-        f.write(privatekey.exportKey(format='PEM',passphrase=user.password1))
+        f.write(privatekey.exportKey(format='PEM',passphrase=self.cleaned_data.get("password1")))
         f.close()
 
-        f = open ("public.pem", "w")
-        f.write(publickey.exportKey('OpenSSH'))
+        f = open ("public.pem", "wb")
+        f.write(publickey.exportKey())
         f.close()
         
         user.email = self.cleaned_data["email"]
