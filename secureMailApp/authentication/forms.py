@@ -19,20 +19,28 @@ def decrypt_message(encoded_encrypted_msg, privatekey):
 
 class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    modulus_length = 256*4 # use larger value in production
-	privatekey = RSA.generate(modulus_length, Random.new().read)
-	publickey = privatekey.publickey()
-    f = open ("public.txt", "w")
-    f.write(publickey.exportKey())
-    f.close()
-    #publickey = forms.CharField(max_length=255, label='Public Key',required=True)
+    publickey = forms.CharField(max_length=255, label='Public Key',required=True)
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2", "publickey")
+        fields = ("username", "email", "password1", "password2")
 
     def save(self, commit=True):
         user = super(NewUserForm, self).save(commit=False)
+
+        modulus_length = 256*4 
+        privatekey = RSA.generate(modulus_length, Random.new().read) 
+        publickey = privatekey.publickey()
+
+        f = open("private.pem", "wb")
+        f.write(privatekey.exportKey(format='PEM',passphrase=user.password1))
+        f.close()
+
+        f = open ("public.pem", "w")
+        f.write(publickey.exportKey('OpenSSH'))
+        f.close()
+        
         user.email = self.cleaned_data["email"]
+        user.publickey = publickey
         if commit:
             user.save()
         return user
