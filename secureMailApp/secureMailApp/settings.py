@@ -56,7 +56,7 @@ ROOT_URLCONF = 'secureMailApp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,6 +82,9 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = (
+    ('django.contrib.auth.backends.ModelBackend'),
+)
 ###
 AUTH_USER_MODEL = 'authentication.sysuser'
 # Password validation

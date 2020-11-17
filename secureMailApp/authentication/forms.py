@@ -8,17 +8,6 @@ from Crypto.PublicKey import RSA
 import base64
 import smtplib, ssl
 
-
-def encrypt_message(a_message , publickey):
-	encrypted_msg = publickey.encrypt(a_message.encode('utf-8'), 32)[0]
-	encoded_encrypted_msg = base64.b64encode(encrypted_msg) # base64 encoded strings are database friendly
-	return encoded_encrypted_msg
-
-def decrypt_message(encoded_encrypted_msg, privatekey):
-	decoded_encrypted_msg = base64.b64decode(encoded_encrypted_msg)
-	decoded_decrypted_msg = privatekey.decrypt(decoded_encrypted_msg)
-	return decoded_decrypted_msg.decode("utf-8")
-
 class NewUserForm(UserCreationForm):
     class Meta:
         model = sysuser
@@ -36,7 +25,8 @@ class NewUserForm(UserCreationForm):
         f.close()
 
         f = open ("public.pem", "wb")
-        f.write(publickey.exportKey())
+        publickey = publickey.export_key(format='PEM')
+        f.write(publickey)
         f.close()
         
         user.email = self.cleaned_data["email"]
@@ -44,21 +34,3 @@ class NewUserForm(UserCreationForm):
         if commit:
             user.save()
         return user
-    
-
-class MsgForm(forms.Form):
-    class Meta:
-        rec_email = forms.CharField(label='rec_mail', max_length=100)
-        msg_body  = forms.CharField(label='msg', max_length=100)
-
-    def save(self, request, sender_email, password):
-        # get user's pub key--lookup
-        rec_pub_key = "hi"
-        encrypted_msg = encrypt_message(request.POST['msg'], rec_pub_key)
-
-        # Create a secure SSL context
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, request.POST['rec_email'], encrypted_msg)
-
