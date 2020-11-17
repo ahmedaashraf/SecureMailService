@@ -13,22 +13,27 @@ import hashlib
 
 from Crypto import Random
 from Crypto.PublicKey.RSA import generate,importKey
+from Crypto.Cipher import PKCS1_OAEP
 import base64
 import smtplib, ssl
 
 def encrypt_message(a_message , publickey):
-	encrypted_msg = publickey.encrypt(a_message.encode('utf-8'), 32)[0]
-	encoded_encrypted_msg = base64.b64encode(encrypted_msg) # base64 encoded strings are database friendly
-	return encoded_encrypted_msg
+    encryptor = PKCS1_OAEP.new(publickey)
+    encrypted_msg = encryptor.encrypt(a_message.encode('utf-8'))
+    # encoded_encrypted_msg = base64.b64encode(encrypted_msg) # base64 encoded strings are database friendly
+    return encrypted_msg
 
 def decrypt_message(encoded_encrypted_msg, privatekey):
+    # decryptor = PKCS1_OAEP.new(key)
+    # decrypted = decryptor.decrypt(ast.literal_eval(str(encrypted)))
 	decoded_encrypted_msg = base64.b64decode(encoded_encrypted_msg)
 	decoded_decrypted_msg = privatekey.decrypt(decoded_encrypted_msg)
 	return decoded_decrypted_msg.decode("utf-8")
 
 def sendemail(sender_email,sender_password,rec_email,subject,message,publickey):
-    print(publickey)
-    pkey = importKey(publickey)
+    # print(publickey)
+    # print(type(publickey))
+    pkey = importKey(publickey[2:len(publickey)-1])
     encrypted_msg = encrypt_message("Subject:"+ subject + "\n\n\n" + message, pkey)
     # Create a secure SSL context
     context = ssl.create_default_context()

@@ -25,7 +25,7 @@ class NewUserForm(UserCreationForm):
         f.close()
 
         f = open ("public.pem", "wb")
-        publickey = publickey.export_key(format='PEM')
+        publickey = publickey.export_key(format='OpenSSH')
         f.write(publickey)
         f.close()
         
