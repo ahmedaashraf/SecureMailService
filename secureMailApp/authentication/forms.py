@@ -20,7 +20,7 @@ class NewUserForm(UserCreationForm):
         privatekey = RSA.generate(modulus_length, Random.new().read) 
         publickey = privatekey.publickey()
 
-        f = open("private.pem", "wb")
+        f = open("private"+user.email+".pem", "wb")
         f.write(privatekey.exportKey(format='PEM',passphrase=self.cleaned_data.get("password1")))
         f.close()
 
