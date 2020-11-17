@@ -5,15 +5,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractUser
 
 from .managers import CustomUserManager
-from picklefield.fields import PickledObjectField
 
 # Create your models here.
 class sysuser(AbstractUser):
 
     username = None
     email = models.EmailField(_('email address'),unique=True)
-    publickey = PickledObjectField()
-   
+    publickey = models.CharField(max_length=255)
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     
