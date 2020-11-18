@@ -9,7 +9,13 @@
     {% csrf_token %}
     {{form.as_p}}
     <div class="form-actions">
-        <button type="submit">Send</button>
+        <button name="send" type="submit">Send</button>
+    </div>
+
+    <h4> View Your Inbox </h4>
+
+    <div class="form-actions">
+        <button action="/rec" name="inbox" type="submit">My Inbox</button>
     </div>
 </form>
 </div>

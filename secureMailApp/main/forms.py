@@ -8,7 +8,6 @@ class ContactForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
     
 
-
 # class MsgForm(forms.Form):
 #     class Meta:
 #         rec_email = forms.CharField(label='rec_mail', max_length=100)
